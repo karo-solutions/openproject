@@ -26,8 +26,25 @@
 # See COPYRIGHT and LICENSE files for more details.
 #++
 
-class Meeting::Type < ApplicationForm
+class Meeting::RecurringFrequency < ApplicationForm
   form do |meeting_form|
-    meeting_form.hidden(name: :type, value: @builder.object.class.name)
+    meeting_form.text_field(
+      name: :title,
+      required: true,
+      label: Meeting.human_attribute_name(:title),
+      placeholder: Meeting.human_attribute_name(:title),
+      visually_hide_label: false
+    )
+    meeting_form.select_list(
+      name: :frequency,
+      label: I18n.t("activerecord.attributes.recurring_meeting.frequency"),
+      input_width: :medium,
+      caption: I18n.t("saml.instructions.signature_method", default_option: "RSA SHA-1")
+    ) do |list|
+      %i[daily weekly monthly yearly].each do |value|
+        label = I18n.t(:"recurring_meeting.frequency.#{value}")
+        list.option(label:, value:)
+      end
+    end
   end
 end

@@ -41,6 +41,12 @@
               render(Meeting::Type.new(f))
             end
 
+            if @meeting.is_a?(RecurringMeeting)
+              modal_body.with_row(mt: 3) do
+                render(Meeting::RecurringFrequency.new(f))
+              end
+            end
+
             if @copy_from
               modal_body.with_row do
                 render(Meeting::CopiedFrom.new(f, id: @copy_from.id))

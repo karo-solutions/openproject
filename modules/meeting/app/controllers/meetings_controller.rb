@@ -342,13 +342,14 @@ class MeetingsController < ApplicationController
   end
 
   def meeting_class
-  case params[:type]
-  when "recurring"
-    RecurringMeeting
-  when "structured"
-    StructuredMeeting
-  else
-    Meeting
+    case params[:type]
+    when "recurring"
+      RecurringMeeting
+    when "structured"
+      StructuredMeeting
+    else
+      Meeting
+    end
   end
 
   def global_upcoming_meetings
@@ -397,15 +398,6 @@ class MeetingsController < ApplicationController
       params
         .require(:structured_meeting)
         .permit(:title, :location, :start_time_hour, :duration, :start_date, :state, :lock_version)
-    end
-  end
-
-  def meeting_type(given_type)
-    case given_type
-    when "dynamic"
-      "StructuredMeeting"
-    else
-      "Meeting"
     end
   end
 
