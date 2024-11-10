@@ -33,12 +33,12 @@ module Meetings
     include OpTurbo::Streamable
     include OpPrimer::ComponentHelpers
 
-    def initialize(meeting:, project:, type:)
+    def initialize(meeting:, project:, copy_from: nil)
       super
 
       @meeting = meeting
       @project = project
-      @type = type
+      @copy_from = copy_from
     end
 
     private
@@ -52,7 +52,14 @@ module Meetings
     end
 
     def title
-      @type == :new ? I18n.t("label_meeting_new_one_time") : "Copy meeting"
+      return I18n.t(:label_meeting_copy) if @copy_from
+
+      case @meeting
+      when RecurringMeeting
+        I18n.t("label_meeting_new_recurring")
+      else
+        I18n.t("label_meeting_new_one_time")
+      end
     end
   end
 end

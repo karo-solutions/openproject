@@ -47,15 +47,7 @@ module Meetings
                   query_params: { filters: upcoming_filter, sort: "start_time" }),
         menu_item(title: I18n.t(:label_past_meetings),
                   query_params: { filters: past_filter, sort: "start_time:desc" }),
-        recurring_menu_item
       ].compact
-    end
-
-    def recurring_menu_item
-      return unless OpenProject::FeatureDecisions.recurring_meetings_active?
-
-      menu_item(title: I18n.t(:label_recurring_meeting_plural),
-                query_params: { filters: recurring_meeting_type_filter, sort: "start_time:desc" })
     end
 
     def involvement_sidebar_menu_items

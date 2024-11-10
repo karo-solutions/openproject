@@ -1,10 +1,11 @@
 <%=
   render(Primer::Alpha::Dialog.new(
-    id: "new-meeting-dialog", title: title,
+    id: "new-meeting-dialog",
+    title:,
     size: :medium_portrait,
     data: { 'keep-open-on-submit': true }
   )) do |dialog|
     dialog.with_header(variant: :large)
-    render(Meetings::Index::FormComponent.new(meeting: @meeting, project: @project, type: @type))
+    render(Meetings::Index::FormComponent.new(meeting: @meeting, project: @project, copy_from: @copy_from))
   end
 %>

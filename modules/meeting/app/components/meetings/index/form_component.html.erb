@@ -41,9 +41,9 @@
               render(Meeting::Type.new(f))
             end
 
-            unless @type == :new
+            if @copy_from
               modal_body.with_row do
-                render(Meeting::CopiedFrom.new(f, id: @type.id))
+                render(Meeting::CopiedFrom.new(f, id: @copy_from.id))
               end
 
               modal_body.with_row(mt: 3) do

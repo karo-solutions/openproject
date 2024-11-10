@@ -127,7 +127,7 @@ class MeetingsController < ApplicationController
             component: Meetings::Index::FormComponent.new(
               meeting: @meeting,
               project: @project,
-              type: @copy_from || :new
+              copy_from: @copy_from
             ),
             status: :bad_request
           )
@@ -139,7 +139,10 @@ class MeetingsController < ApplicationController
   end
 
   def new_dialog
-    respond_with_dialog Meetings::Index::DialogComponent.new(meeting: @meeting, project: @project, type: :new)
+    respond_with_dialog Meetings::Index::DialogComponent.new(
+      meeting: @meeting,
+      project: @project,
+    )
   end
 
   def new; end
@@ -161,7 +164,11 @@ class MeetingsController < ApplicationController
       end
 
       format.turbo_stream do
-        respond_with_dialog Meetings::Index::DialogComponent.new(meeting: @meeting, project: @project, type: copy_from)
+        respond_with_dialog Meetings::Index::DialogComponent.new(
+          meeting: @meeting,
+          project: @project,
+          copy_from:
+        )
       end
     end
   end
@@ -329,9 +336,19 @@ class MeetingsController < ApplicationController
   end
 
   def build_meeting
-    @meeting = Meeting.new
+    @meeting = meeting_class.new
     @meeting.project = @project
     @meeting.author = User.current
+  end
+
+  def meeting_class
+  case params[:type]
+  when "recurring"
+    RecurringMeeting
+  when "structured"
+    StructuredMeeting
+  else
+    Meeting
   end
 
   def global_upcoming_meetings
