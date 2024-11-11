@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2024 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -26,14 +26,17 @@
 # See COPYRIGHT and LICENSE files for more details.
 #++
 
-class RecurringMeeting::TitleForm < ApplicationForm
-  include OpenProject::StaticRouting::UrlHelpers
-
-  form do |form|
-  end
-
-  def initialize(meeting:)
-    super()
-    @meeting = meeting
+class RecurringMeeting::EndAfter < ApplicationForm
+  form do |meeting_form|
+    meeting_form.select_list(
+      name: "end_after",
+      label: I18n.t("activerecord.attributes.recurring_meeting.end_after"),
+      data: {
+        "show-when-value-selected-target": "cause"
+      }
+    ) do |list|
+      list.option(value: "specific_date", label: I18n.t("recurring_meeting.end_after.specific_date"))
+      list.option(value: "iterations", label: I18n.t("recurring_meeting.end_after.iterations"))
+    end
   end
 end

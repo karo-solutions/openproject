@@ -64,7 +64,7 @@ en:
       recurring_meeting:
         frequency: "Frequency"
         end_after: "End after"
-        iterations: "Iterations"
+        iterations: "Occurrences"
     errors:
       messages:
         invalid_time_format: "is not a valid time. Required format: HH:MM"
@@ -191,6 +191,9 @@ en:
       weekly: "Weekly"
       monthly: "Monthly"
       yearly: "Yearly"
+    end_after:
+      specific_date: "A specific date"
+      iterations: "A number of occurrences"
 
   notice_successful_notification: "Notification sent successfully"
   notice_timezone_missing: No time zone is set and %{zone} is assumed. To choose your time zone, please click here.

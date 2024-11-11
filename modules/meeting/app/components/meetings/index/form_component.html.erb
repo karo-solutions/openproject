@@ -4,7 +4,10 @@
       scope: :meeting,
       model: @meeting,
       method: :post,
-      data: { turbo: true },
+      data: {
+        turbo: true,
+        controller: "show-when-value-selected"
+      },
       html: { :id => 'meeting-form' },
       url: {:controller => '/meetings', :action => 'create', :project_id => @project}
     ) do |f|
@@ -37,14 +40,30 @@
               render(Meeting::Location.new(f))
             end
 
-            modal_body.with_row do
-              render(Meeting::Type.new(f))
-            end
-
             if @meeting.is_a?(RecurringMeeting)
               modal_body.with_row(mt: 3) do
-                render(Meeting::RecurringFrequency.new(f))
+                render(RecurringMeeting::Frequency.new(f))
               end
+
+              modal_body.with_row(mt: 3) do
+                render(RecurringMeeting::EndAfter.new(f))
+              end
+
+              modal_body.with_row(mt: 3,
+                                  data: { value: "specific_date", "show-when-value-selected-target": "effect" }
+                                  ) do
+                render(RecurringMeeting::SpecificDate.new(f))
+              end
+
+              modal_body.with_row(mt: 3,
+                                  hidden: true,
+                                  data: { value: "iterations", "show-when-value-selected-target": "effect" }) do
+                render(RecurringMeeting::Iterations.new(f))
+              end
+            end
+
+            modal_body.with_row do
+              render(Meeting::Type.new(f))
             end
 
             if @copy_from
