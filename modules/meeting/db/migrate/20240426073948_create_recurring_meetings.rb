@@ -13,7 +13,7 @@ class CreateRecurringMeetings < ActiveRecord::Migration[7.1]
       t.timestamps
     end
 
-    add_reference :meetings, :recurring_meeting_id, index: true
+    add_reference :meetings, :recurring_meeting, index: true
     add_column :meetings, :template, :boolean, default: false, null: false
   end
 end

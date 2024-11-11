@@ -1,10 +1,15 @@
 class RecurringMeetingsController < ApplicationController
   include Layout
+  include OpTurbo::ComponentStream
+  include OpTurbo::FlashStreamHelper
+  include OpTurbo::DialogStreamHelper
 
   before_action :find_meeting, only: %i[show]
   before_action :find_optional_project, only: %i[index show new create]
   before_action :authorize_global, only: %i[index new create]
   before_action :authorize, only: %i[show]
+
+  before_action :convert_params, only: %i[create]
 
   menu_item :meetings
 
@@ -24,14 +29,27 @@ class RecurringMeetingsController < ApplicationController
   def show; end
 
   def create
-    @recurring_meeting = RecurringMeeting.new(recurring_meeting_params.merge(project: @project))
-    create_schedule(params[:recurring_meeting])
+    call = ::RecurringMeetings::CreateService
+      .new(user: current_user)
+      .call(@converted_params)
 
-    if @recurring_meeting.save
-      flash[:notice] = t(:notice_successful_create)
-      redirect_to action: :index
+    if call.success?
+      redirect_to status: :see_other, action: :show, id: call.result
     else
-      render action: :new
+      respond_to do |format|
+        format.turbo_stream do
+          update_via_turbo_stream(
+            component: Meetings::Index::FormComponent.new(
+              meeting: call.result,
+              project: @project,
+              copy_from: @copy_from
+            ),
+            status: :bad_request
+          )
+
+          respond_with_turbo_streams
+        end
+      end
     end
   end
 
@@ -49,38 +67,35 @@ class RecurringMeetingsController < ApplicationController
     render_404
   end
 
-  def recurring_meeting_params
-    params
-      .require(:recurring_meeting)
-      .permit(:title)
+  def convert_params
+    # We do some preprocessing of `meeting_params` that we will store in this
+    # instance variable.
+    @converted_params = recurring_meeting_params.to_h
+
+    @converted_params[:project] = @project
+    @converted_params[:duration] = @converted_params[:duration].to_hours if @converted_params[:duration].present?
   end
 
-  def create_schedule(params) # rubocop:disable Metrics/AbcSize,Metrics/PerceivedComplexity
-    interval = params[:interval].to_i
-    recurrence = params[:recurrence]
-    ends = params[:end]
+  def recurring_meeting_params
+    params
+      .require(:meeting)
+      .permit(:title, :location, :start_time_hour, :duration, :start_date,
+              :frequency, :end_after, :end_date, :iterations)
+  end
 
-    days = [] # make the form pass an array directly
-    days << :monday if params[:monday].to_i == 1
-    days << :tuesday if params[:tuesday].to_i == 1
-    days << :wednesday if params[:wednesday].to_i == 1
-    days << :thursday if params[:thursday].to_i == 1
-    days << :friday if params[:friday].to_i == 1
-    days << :saturday if params[:saturday].to_i == 1
-    days << :sunday if params[:sunday].to_i == 1
+  def find_copy_from_meeting
+    copied_from_meeting_id = params[:copied_from_meeting_id] || params[:meeting][:copied_from_meeting_id]
+    return unless copied_from_meeting_id
 
-    schedule = IceCube::Schedule.new
-    rule = IceCube::Rule
-      .then { |r| recurrence == "daily" ? r.daily(interval) : r }
-      .then { |r| recurrence == "workdays" ? r.weekly(interval).day(:monday, :tuesday, :wednesday, :thursday, :friday) : r } # has to match chosen working days # rubocop:disable Layout/LineLength
-      .then { |r| recurrence == "weekly" ? r.weekly(interval).day(*days) : r }
-      .then { |r| recurrence == "monthly" ? r.monthly(interval) : r }
-      # .then { |r| ends == "never" ? r.until(params[:start_date] + 12.months) : r } # 12 month max or some sort of limit for 'never'? ; start_date needs to be added in # rubocop:disable Layout/LineLength
-      # .then { |r| ends == "date" ? r.until(params[:end_date]) : r } # end_date needs to be added in
-      .then { |r| ends == "after" ? r.count(params[:count].to_i) : r }
+    @copy_from = Meeting.visible.find(copied_from_meeting_id)
+  rescue ActiveRecord::RecordNotFound
+    render_404
+  end
 
-    schedule.add_recurrence_rule(rule)
-
-    @recurring_meeting.schedule = schedule
+  def structured_meeting_params
+    if params[:structured_meeting].present?
+      params
+        .require(:structured_meeting)
+    end
   end
 end

@@ -26,36 +26,35 @@
 # See COPYRIGHT and LICENSE files for more details.
 #++
 
-module Meetings
-  class Index::FormComponent < ApplicationComponent
-    include ApplicationHelper
-    include OpTurbo::Streamable
-    include OpPrimer::ComponentHelpers
+module RecurringMeetings
+  class CreateService < ::BaseServices::Create
+    protected
 
-    def initialize(meeting:, project:, copy_from: nil)
+    attr_accessor :template_params
+
+    def before_perform(params, _)
+      @template_params = extract_template_params(params)
+
       super
-
-      @meeting = meeting
-      @project = project
-      @copy_from = copy_from
     end
 
-    private
+    def after_perform(call)
+      return call unless call.success?
 
-    def create_controller
-      if @meeting.is_a?(RecurringMeeting)
-        "/recurring_meetings"
-      else
-        "/meetings"
+      template = StructuredMeeting.new(@template_params)
+      template.template = true
+      template.recurring_meeting = call.result
+
+      unless template.save
+        call.result = false
+        call.errors.merge!(template.errors)
       end
+
+      call
     end
 
-    def start_date_initial_value
-      @meeting.start_date.presence || format_time_as_date(@meeting.start_time, format: "%Y-%m-%d")
-    end
-
-    def start_time_initial_value
-      @meeting.start_time_hour.presence || format_time(@meeting.start_time, include_date: false, format: "%H:%M")
+    def extract_template_params(params)
+      params.slice(:start_date, :start_time_hour, :title, :location, :duration)
     end
   end
 end

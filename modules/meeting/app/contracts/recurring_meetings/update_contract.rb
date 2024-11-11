@@ -26,36 +26,14 @@
 # See COPYRIGHT and LICENSE files for more details.
 #++
 
-module Meetings
-  class Index::FormComponent < ApplicationComponent
-    include ApplicationHelper
-    include OpTurbo::Streamable
-    include OpPrimer::ComponentHelpers
+module RecurringMeetings
+  class UpdateContract < BaseContract
+    validate :user_allowed_to_edit
 
-    def initialize(meeting:, project:, copy_from: nil)
-      super
-
-      @meeting = meeting
-      @project = project
-      @copy_from = copy_from
-    end
-
-    private
-
-    def create_controller
-      if @meeting.is_a?(RecurringMeeting)
-        "/recurring_meetings"
-      else
-        "/meetings"
+    def user_allowed_to_edit
+      unless user.allowed_in_project?(:edit_meetings, model.project)
+        errors.add :base, :error_unauthorized
       end
-    end
-
-    def start_date_initial_value
-      @meeting.start_date.presence || format_time_as_date(@meeting.start_time, format: "%Y-%m-%d")
-    end
-
-    def start_time_initial_value
-      @meeting.start_time_hour.presence || format_time(@meeting.start_time, include_date: false, format: "%H:%M")
     end
   end
 end

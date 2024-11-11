@@ -26,36 +26,12 @@
 # See COPYRIGHT and LICENSE files for more details.
 #++
 
-module Meetings
-  class Index::FormComponent < ApplicationComponent
-    include ApplicationHelper
-    include OpTurbo::Streamable
-    include OpPrimer::ComponentHelpers
-
-    def initialize(meeting:, project:, copy_from: nil)
-      super
-
-      @meeting = meeting
-      @project = project
-      @copy_from = copy_from
-    end
-
-    private
-
-    def create_controller
-      if @meeting.is_a?(RecurringMeeting)
-        "/recurring_meetings"
-      else
-        "/meetings"
+module RecurringMeetings
+  class SetAttributesService < ::BaseServices::SetAttributes
+    def set_default_attributes(_params)
+      model.change_by_system do
+        model.author = user
       end
-    end
-
-    def start_date_initial_value
-      @meeting.start_date.presence || format_time_as_date(@meeting.start_time, format: "%Y-%m-%d")
-    end
-
-    def start_time_initial_value
-      @meeting.start_time_hour.presence || format_time(@meeting.start_time, include_date: false, format: "%H:%M")
     end
   end
 end
