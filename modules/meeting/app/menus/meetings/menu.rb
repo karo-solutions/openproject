@@ -47,7 +47,19 @@ module Meetings
                   query_params: { filters: upcoming_filter, sort: "start_time" }),
         menu_item(title: I18n.t(:label_past_meetings),
                   query_params: { filters: past_filter, sort: "start_time:desc" }),
+        recurring_menu_item
       ].compact
+    end
+
+    def recurring_menu_item
+      return unless OpenProject::FeatureDecisions.recurring_meetings_active?
+
+      href = polymorphic_path([@project, :recurring_meetings])
+      OpenProject::Menu::MenuItem.new(
+        title: I18n.t("label_recurring_meeting_plural"),
+        href:,
+        selected: params[:current_href] == href
+      )
     end
 
     def involvement_sidebar_menu_items

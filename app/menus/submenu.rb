@@ -144,4 +144,8 @@ class Submenu
   def query_path(query_params)
     raise NotImplementedError
   end
+
+  def url_helpers
+    @url_helpers ||= OpenProject::StaticRouting::StaticRouter.new.url_helpers
+  end
 end
