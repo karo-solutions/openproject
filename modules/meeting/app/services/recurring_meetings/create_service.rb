@@ -42,12 +42,12 @@ module RecurringMeetings
       return call unless call.success?
 
       template = StructuredMeeting.new(@template_params)
+      template.project = call.result.project
       template.template = true
       template.recurring_meeting = call.result
 
       unless template.save
-        call.result = false
-        call.errors.merge!(template.errors)
+        call.merge! ServiceResult.failure(result: template, errors: template.errors)
       end
 
       call
