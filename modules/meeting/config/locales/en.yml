@@ -127,6 +127,7 @@ en:
   label_recurring_meeting: "Recurring meeting"
   label_recurring_meeting_new: "New recurring meeting"
   label_recurring_meeting_plural: "Recurring meetings"
+  label_template: "Template"
   label_upcoming_meetings: "Upcoming meetings"
   label_past_meetings: "Past meetings"
   label_upcoming_meetings_short: "Upcoming"
@@ -186,6 +187,11 @@ en:
     empty_text: "Drag items here or create a new one"
 
   recurring_meeting:
+    template:
+      banner: >
+        You are currently editing a template for a recurring meeting.
+        Every new instance of a metting in this series will use this template.
+        Changes will not affect past or already created meetings.
     frequency:
       daily: "Daily"
       weekly: "Weekly"

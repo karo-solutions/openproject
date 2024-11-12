@@ -26,7 +26,11 @@ class RecurringMeetingsController < ApplicationController
     @recurring_meeting = RecurringMeeting.new(project: @project)
   end
 
-  def show; end
+  def show
+    respond_to do |format|
+      format.html
+    end
+  end
 
   def create
     call = ::RecurringMeetings::CreateService

@@ -41,11 +41,7 @@ module RecurringMeetings
     def after_perform(call)
       return call unless call.success?
 
-      template = StructuredMeeting.new(@template_params)
-      template.project = call.result.project
-      template.template = true
-      template.recurring_meeting = call.result
-
+      template = create_meeting_template
       unless template.save
         call.merge! ServiceResult.failure(result: template, errors: template.errors)
       end
@@ -55,6 +51,15 @@ module RecurringMeetings
 
     def extract_template_params(params)
       params.slice(:start_date, :start_time_hour, :title, :location, :duration)
+    end
+
+    def create_meeting_template
+      StructuredMeeting.new(@template_params).tap do |template|
+        template.project = call.result.project
+        template.template = true
+        template.recurring_meeting = call.result
+        template.author = user
+      end
     end
   end
 end
