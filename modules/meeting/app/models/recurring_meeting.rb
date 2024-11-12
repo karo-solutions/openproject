@@ -12,8 +12,9 @@ class RecurringMeeting < ApplicationRecord
   enum frequency: {
     daily: 0,
     weekly: 1,
-    monthly: 2,
-    yearly: 3
+    biweekly: 2,
+    monthly: 3,
+    yearly: 4
   }.freeze, _prefix: true
 
   enum end_after: {

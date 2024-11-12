@@ -195,6 +195,7 @@ en:
     frequency:
       daily: "Daily"
       weekly: "Weekly"
+      biweekly: "Bi-weekly (Every 2 weeks)"
       monthly: "Monthly"
       yearly: "Yearly"
     end_after:
