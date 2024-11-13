@@ -27,7 +27,7 @@
           end
 
           details.with_row(mt: 2) do
-            render_meeting_attribute_row(:"git-commit") do
+            render_meeting_attribute_row(:calendar) do
               render(Primer::Beta::Text.new) do
                 @meeting.recurring_meeting.human_date_of_week
               end
