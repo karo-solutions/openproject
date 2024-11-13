@@ -41,6 +41,7 @@ module Meetings
       super
 
       @meeting = meeting
+      @series = meeting.recurring_meeting
       @project = project
       @state = fetch_or_fallback(STATE_OPTIONS, state)
     end
@@ -75,8 +76,8 @@ module Meetings
     end
 
     def meeting_series_element
-      if @meeting.recurring_meeting.present?
-        { href: recurring_meeting_path(@meeting), text: @meeting.recurring_meeting.title }
+      if @series.present?
+        { href: recurring_meeting_path(@series), text: @series.title }
       end
     end
 
