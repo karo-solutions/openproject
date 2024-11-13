@@ -53,7 +53,7 @@ module Meetings
     private
 
     def delete_enabled?
-      User.current.allowed_in_project?(:delete_meetings, @meeting.project)
+      !@meeting.templated? && User.current.allowed_in_project?(:delete_meetings, @meeting.project)
     end
 
     def breadcrumb_items

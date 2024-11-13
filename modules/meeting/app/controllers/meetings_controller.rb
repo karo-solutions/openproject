@@ -39,6 +39,7 @@ class MeetingsController < ApplicationController
   before_action :authorize, except: %i[index new create update_title update_details update_participants change_state new_dialog]
   before_action :authorize_global,
                 only: %i[index new create update_title update_details update_participants change_state new_dialog]
+  before_action :prevent_template_destruction, only: :destroy
 
   helper :watchers
   helper :meeting_contents
@@ -457,5 +458,9 @@ class MeetingsController < ApplicationController
       copy_attachments: copy_param(:copy_attachments),
       send_notifications: copy_param(:send_notifications)
     }
+  end
+
+  def prevent_template_destruction
+    render_400 if @meeting.templated?
   end
 end
