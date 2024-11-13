@@ -27,9 +27,38 @@ class RecurringMeetingsController < ApplicationController
   end
 
   def show
+    @meetings = collect_meetings
+
     respond_to do |format|
       format.html
     end
+  end
+
+  def collect_meetings
+    meetings = []
+    @recurring_meeting.meetings.each do |meeting|
+      meetings << meeting unless meeting.template == true
+    end
+
+    template_attributes = @recurring_meeting.meetings.where(template: true).first.attributes
+    @recurring_meeting.schedule.all_occurrences.each do |date|
+      exists = meetings.find { |m| m["start_time"] == date }
+      unless exists
+        attributes = template_attributes.dup
+        attributes["start_time"] = date
+        attributes["state"] = "scheduled"
+        attributes["template"] = false
+        meetings << Meeting.new(**attributes)
+        # @recurring_meeting.meetings.build(**attributes)
+      end
+    end
+
+    # SELECT COALESCE(meetings.start_time, meetings.recurring_date) start_time_test FROM
+    # (SELECT * FROM (VALUES (to_timestamp('2024-10-06 11:30:00', 'YYYY-MM-DD HH24:MI:SS'), 'ABC'),
+    # (to_timestamp('2024-10-06 11:30:00', 'YYYY-MM-DD HH24:MI:SS'), 'ABC')) AS t (recurring_date, recurring_title)
+    # FULL JOIN meetings ON meetings.start_time = t.recurring_date) meetings ORDER BY start_time_test;
+
+    meetings
   end
 
   def create

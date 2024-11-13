@@ -2,7 +2,7 @@
 
 # -- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2010-2024 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -29,62 +29,27 @@
 # ++
 
 module RecurringMeetings
-  class IndexPageHeaderComponent < ApplicationComponent
-    include OpPrimer::ComponentHelpers
+  # rubocop:disable OpenProject/AddPreviewForViewComponent
+  class IndexSubHeaderComponent < ApplicationComponent
+    # rubocop:enable OpenProject/AddPreviewForViewComponent
     include ApplicationHelper
 
-    def initialize(project: nil, meeting: nil)
+    def initialize(query: nil, project: nil)
       super
-
+      @query = query
       @project = project
-      @meeting = meeting
-    end
-
-    def render_create_button?
-      if @project
-        User.current.allowed_in_project?(:create_meetings, @project)
-      else
-        User.current.allowed_in_any_project?(:create_meetings)
-      end
     end
 
     def dynamic_path
-      polymorphic_path([:new, @project, :recurring_meeting])
-    end
-
-    def id
-      "add-recurring-meeting-button"
+      polymorphic_path([:new, @project, :meeting])
     end
 
     def accessibility_label_text
-      I18n.t(:label_recurring_meeting_new)
+      I18n.t(:label_meeting_new)
     end
 
     def label_text
-      I18n.t(:label_recurring_meeting)
-    end
-
-    def page_title
-      @meeting.present? ? @meeting.title + " (Meeting series)" : I18n.t(:label_recurring_meeting_plural)
-    end
-
-    def page_description
-      "Meeting schedule goes here"
-    end
-
-    def breadcrumb_items
-      [parent_element,
-       { href: @project.present? ? project_meetings_path(@project.id) : meetings_path,
-         text: I18n.t(:label_meeting_plural) },
-       page_title]
-    end
-
-    def parent_element
-      if @project.present?
-        { href: project_overview_path(@project.id), text: @project.name }
-      else
-        { href: home_path, text: I18n.t(:label_home) }
-      end
+      I18n.t(:label_meeting)
     end
   end
 end

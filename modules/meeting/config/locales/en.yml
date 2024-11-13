@@ -128,6 +128,8 @@ en:
   label_recurring_meeting_new: "New recurring meeting"
   label_recurring_meeting_plural: "Recurring meetings"
   label_template: "Template"
+  label_recurring_meeting_create: "Create from template"
+  label_recurring_meeting_cancel: "Cancel this occurrence"
   label_upcoming_meetings: "Upcoming meetings"
   label_past_meetings: "Past meetings"
   label_upcoming_meetings_short: "Upcoming"
@@ -205,6 +207,7 @@ en:
     end_after:
       specific_date: "A specific date"
       iterations: "A number of occurrences"
+    starts: "Starts"
 
   notice_successful_notification: "Notification sent successfully"
   notice_timezone_missing: No time zone is set and %{zone} is assumed. To choose your time zone, please click here.
@@ -274,6 +277,9 @@ en:
   label_meeting_state_open_html: "<i>Open</i>"
   label_meeting_state_closed: "Closed"
   label_meeting_state_closed_html: "<i>Closed</i>"
+  label_meeting_state_agenda_created: "Agenda created"
+  label_meeting_state_scheduled: "Scheduled"
+  label_meeting_state_cancelled: "Cancelled"
   label_meeting_reopen_action: "Reopen meeting"
   label_meeting_close_action: "Close meeting"
   text_meeting_open_description: "This meeting is open. You can add/remove agenda items and edit them as you please. After the meeting is over, close it to lock it."

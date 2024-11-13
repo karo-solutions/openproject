@@ -28,12 +28,11 @@ See COPYRIGHT and LICENSE files for more details.
 ++#%>
 <% html_title t(:label_recurring_meeting_plural) %>
 
-<%= render(Meetings::IndexPageHeaderComponent.new(project: @project)) %>
+<%= render(RecurringMeetings::IndexPageHeaderComponent.new(project: @project, meeting: @recurring_meeting)) %>
+<%= render(RecurringMeetings::IndexSubHeaderComponent.new( project: @project)) %>
 
-<% if @recurring_meetings.empty? -%>
+<% if @recurring_meeting.nil? -%>
   <%= no_results_box %>
 <% else -%>
-  <% @recurring_meetings.each do |meeting| %>
-    <%= link_to meeting.title, recurring_meeting_path(meeting) %>
-  <% end %>
+  <%= render RecurringMeetings::TableComponent.new(rows: @meetings, current_project: @project) %>
 <% end -%>
