@@ -48,3 +48,9 @@ OpenProject::FeatureDecisions.add :custom_field_of_type_hierarchy,
 
 OpenProject::FeatureDecisions.add :recurring_meetings,
                                   description: "Differentiate between one-time and recurring meetings."
+# TODO: Remove once the feature flag primerized_work_package_activities is removed altogether
+OpenProject::FeatureDecisions.define_singleton_method(:primerized_work_package_activities_active?) do
+  Rails.env.production? ||
+    (Setting.exists?("feature_primerized_work_package_activities_active") &&
+      Setting.send(:feature_primerized_work_package_activities_active?))
+end
