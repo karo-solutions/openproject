@@ -24,6 +24,9 @@ class RecurringMeeting < ApplicationRecord
 
   has_many :meetings, inverse_of: :recurring_meeting
 
+  has_one :template, -> { where(template: true) },
+          class_name: "Meeting"
+
   scope :visible, ->(*args) {
     includes(:project)
       .references(:projects)
