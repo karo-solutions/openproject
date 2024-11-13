@@ -36,6 +36,7 @@ module Meetings
     STATE_DEFAULT = :show
     STATE_EDIT = :edit
     STATE_OPTIONS = [STATE_DEFAULT, STATE_EDIT].freeze
+
     def initialize(meeting:, project: nil, state: STATE_DEFAULT)
       super
 
@@ -56,10 +57,27 @@ module Meetings
     end
 
     def breadcrumb_items
-      [parent_element,
-       { href: @project.present? ? project_meetings_path(@project.id) : meetings_path,
-         text: I18n.t(:label_meeting_plural) },
-       @meeting.title]
+      [
+        parent_element,
+        { href: @project.present? ? project_meetings_path(@project.id) : meetings_path,
+          text: I18n.t(:label_meeting_plural) },
+        meeting_series_element,
+        meeting_element
+      ].compact
+    end
+
+    def meeting_element
+      if @meeting.templated?
+        I18n.t(:label_template)
+      else
+        @meeting.title
+      end
+    end
+
+    def meeting_series_element
+      if @meeting.recurring_meeting.present?
+        { href: recurring_meeting_path(@meeting), text: @meeting.recurring_meeting.title }
+      end
     end
 
     def parent_element
