@@ -228,8 +228,6 @@ class Meeting < ApplicationRecord
       .where(user_id: available_members)
   end
 
-  protected
-
   private
 
   def add_new_participants_as_watcher
@@ -239,12 +237,16 @@ class Meeting < ApplicationRecord
   end
 
   def send_participant_added_mail(participant)
-    if persisted? && Journal::NotificationConfiguration.active?
+    return if templated? || new_record?
+
+    if Journal::NotificationConfiguration.active?
       MeetingMailer.invited(self, participant.user, User.current).deliver_later
     end
   end
 
   def send_rescheduling_mail
+    return if templated? || new_record?
+
     MeetingNotificationService
       .new(self)
       .call :rescheduled,
