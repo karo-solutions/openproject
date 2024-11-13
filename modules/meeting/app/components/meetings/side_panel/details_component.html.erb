@@ -17,10 +17,28 @@
       end
 
       flex_layout do |details|
-        details.with_row do
-          render_meeting_attribute_row(:calendar) do
-            render(Primer::Beta::Text.new) do
-              format_date(@meeting.start_time)
+        if @meeting.template?
+          details.with_row do
+            render_meeting_attribute_row(:"git-commit") do
+              render(Primer::Beta::Text.new) do
+                @meeting.recurring_meeting.human_frequency
+              end
+            end
+          end
+
+          details.with_row(mt: 2) do
+            render_meeting_attribute_row(:"git-commit") do
+              render(Primer::Beta::Text.new) do
+                @meeting.recurring_meeting.human_date_of_week
+              end
+            end
+          end if  @meeting.recurring_meeting.frequency != "daily"
+        else
+          details.with_row do
+            render_meeting_attribute_row(:calendar) do
+              render(Primer::Beta::Text.new) do
+                format_date(@meeting.start_time)
+              end
             end
           end
         end
@@ -30,7 +48,7 @@
             flex_layout(align_items: :center) do |time|
               time.with_column do
                 render(Primer::Beta::Text.new) do
-                  "#{format_time(@meeting.start_time, include_date: false)} - #{format_time(@meeting.end_time, include_date:false)}"
+                  "#{format_time(@meeting.start_time, include_date: false)} - #{format_time(@meeting.end_time, include_date: false)}"
                 end
               end
 

@@ -40,6 +40,15 @@ class RecurringMeeting < ApplicationRecord
     nil
   end
 
+  def human_frequency
+    I18n.t("recurring_meeting.frequency.#{frequency}")
+  end
+
+  def human_date_of_week
+    day_of_the_week = I18n.l(start_time, format: "%A")
+    I18n.t("recurring_meeting.frequency.every_weekday", day_of_the_week:)
+  end
+
   def schedule
     IceCube::Schedule.new(start_time, end_time: end_date).tap do |s|
       s.add_recurrence_rule count_rule(frequency_rule)

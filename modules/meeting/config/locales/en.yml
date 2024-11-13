@@ -146,7 +146,10 @@ en:
 
 
   meeting:
+    participants:
+      template: "These participants will be invited automatically to all future meetings as they are created."
     attachments:
+      template: "These attached files will be included in all future meetings in the series."
       text: "Attached files are available to all meeting participants. You can also drag and drop these into agenda item notes."
     copy:
       title: "Copy meeting: %{title}"
@@ -188,11 +191,12 @@ en:
 
   recurring_meeting:
     template:
-      banner: >
-        You are currently editing a template for a recurring meeting.
-        Every new instance of a metting in this series will use this template.
+      banner_html: >
+        You are currently editing a template of a meeting series: %{link}.
+        Every new instance of a meeting in this series will use this template.
         Changes will not affect past or already created meetings.
     frequency:
+      every_weekday: "Every %{day_of_the_week}"
       daily: "Daily"
       weekly: "Weekly"
       biweekly: "Bi-weekly (Every 2 weeks)"
