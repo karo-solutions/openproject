@@ -57,6 +57,9 @@ Rails.application.routes.draw do
   end
 
   resources :recurring_meetings, only: %i[index new create show] do
+    member do
+      get :details_dialog
+    end
   end
 
   resources :meetings do

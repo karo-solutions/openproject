@@ -7,7 +7,7 @@ class RecurringMeetingsController < ApplicationController
   before_action :find_meeting, only: %i[show]
   before_action :find_optional_project, only: %i[index show new create]
   before_action :authorize_global, only: %i[index new create]
-  before_action :authorize, only: %i[show]
+  before_action :authorize, except: %i[index new create]
 
   before_action :convert_params, only: %i[create]
 
@@ -60,6 +60,8 @@ class RecurringMeetingsController < ApplicationController
 
     meetings
   end
+
+  def details_dialog; end
 
   def create
     call = ::RecurringMeetings::CreateService

@@ -4,11 +4,18 @@
       section.with_title { t(:label_meeting_details) }
 
       if @meeting.editable?
+        href =
+          if @meeting.template?
+            details_dialog_recurring_meeting_path(@meeting.recurring_meeting)
+          else
+            details_dialog_meeting_path(@meeting)
+          end
+
         section.with_action_icon(
           icon: :gear,
           scheme: :invisible,
           tag: :a,
-          href: details_dialog_meeting_path(@meeting),
+          href:,
           classes: "hide-when-print",
           data: { controller: 'async-dialog' },
           'aria-label': t(:label_meeting_details_edit),

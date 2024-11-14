@@ -42,11 +42,19 @@ module Meetings
 
     private
 
-    def create_controller
+    def form_controller
       if @meeting.is_a?(RecurringMeeting)
         "/recurring_meetings"
       else
         "/meetings"
+      end
+    end
+
+    def form_action
+      if @meeting.new_record?
+        :create
+      else
+        :update
       end
     end
 

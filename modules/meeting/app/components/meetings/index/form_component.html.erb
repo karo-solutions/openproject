@@ -3,7 +3,6 @@
     primer_form_with(
       scope: :meeting,
       model: @meeting,
-      method: :post,
       data: {
         turbo: true,
         controller: "show-when-value-selected"
@@ -12,8 +11,8 @@
         id: 'meeting-form'
       },
       url: {
-        controller: create_controller,
-        action: 'create',
+        controller: form_controller,
+        action: form_action,
         project_id: @project
       }
     ) do |f|
@@ -45,11 +44,11 @@
             end
 
             modal_body.with_row(mt: 3) do
-              render(Meeting::Duration.new(f))
+              render(Meeting::Duration.new(f, meeting: @meeting))
             end
 
             modal_body.with_row(mt: 3) do
-              render(Meeting::Location.new(f))
+              render(Meeting::Location.new(f, meeting: @meeting))
             end
 
             if @meeting.is_a?(RecurringMeeting)
