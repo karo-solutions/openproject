@@ -28,5 +28,25 @@
 
 module RecurringMeetings
   class UpdateService < ::BaseServices::Update
+    include WithTemplate
+
+    protected
+
+    def after_perform(call)
+      return call unless call.success?
+
+      update_template(call)
+    end
+
+    def update_template(call)
+      recurring_meeting = call.result
+      template = recurring_meeting.template
+
+      unless template.update(@template_params)
+        call.merge! ServiceResult.failure(result: template, errors: template.errors)
+      end
+
+      call
+    end
   end
 end

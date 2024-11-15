@@ -53,6 +53,7 @@ module Meetings
 
     def title
       return I18n.t(:label_meeting_copy) if @copy_from
+      return I18n.t(:label_meeting_edit) if @meeting.persisted?
 
       case @meeting
       when RecurringMeeting

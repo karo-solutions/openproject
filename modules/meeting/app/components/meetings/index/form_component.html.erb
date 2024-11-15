@@ -3,6 +3,7 @@
     primer_form_with(
       scope: :meeting,
       model: @meeting,
+      method: form_method,
       data: {
         turbo: true,
         controller: "show-when-value-selected"
@@ -104,11 +105,15 @@
         collection.with_component(Primer::Alpha::Dialog::Footer.new) do
           component_collection do |modal_footer|
             modal_footer.with_component(Primer::ButtonComponent.new(data: { 'close-dialog-id': "new-meeting-dialog" })) do
-              I18n.t("button_cancel")
+              I18n.t(:button_cancel)
             end
 
             modal_footer.with_component(Primer::ButtonComponent.new(scheme: :primary, type: :submit)) do
-              I18n.t("label_meeting_create")
+              if @meeting.persisted?
+                I18n.t(:button_save)
+              else
+                I18n.t(:label_meeting_create)
+              end
             end
           end
         end

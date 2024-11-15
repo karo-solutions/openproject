@@ -28,15 +28,9 @@
 
 module RecurringMeetings
   class CreateService < ::BaseServices::Create
+    include WithTemplate
+
     protected
-
-    attr_accessor :template_params
-
-    def before_perform(params, _)
-      @template_params = extract_template_params(params)
-
-      super
-    end
 
     def after_perform(call)
       return call unless call.success?
@@ -47,10 +41,6 @@ module RecurringMeetings
       end
 
       call
-    end
-
-    def extract_template_params(params)
-      params.slice(:start_date, :start_time_hour, :title, :location, :duration)
     end
 
     def create_meeting_template(recurring_meeting)

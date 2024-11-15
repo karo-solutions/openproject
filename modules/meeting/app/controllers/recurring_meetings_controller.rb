@@ -4,12 +4,12 @@ class RecurringMeetingsController < ApplicationController
   include OpTurbo::FlashStreamHelper
   include OpTurbo::DialogStreamHelper
 
-  before_action :find_meeting, only: %i[show]
-  before_action :find_optional_project, only: %i[index show new create]
+  before_action :find_meeting, only: %i[show update details_dialog]
+  before_action :find_optional_project, only: %i[index show new create update details_dialog]
   before_action :authorize_global, only: %i[index new create]
   before_action :authorize, except: %i[index new create]
 
-  before_action :convert_params, only: %i[create]
+  before_action :convert_params, only: %i[create update]
 
   menu_item :meetings
 
@@ -61,7 +61,12 @@ class RecurringMeetingsController < ApplicationController
     meetings
   end
 
-  def details_dialog; end
+  def details_dialog
+    respond_with_dialog Meetings::Index::DialogComponent.new(
+      meeting: @recurring_meeting,
+      project: @recurring_meeting.project
+    )
+  end
 
   def create
     call = ::RecurringMeetings::CreateService
@@ -78,6 +83,30 @@ class RecurringMeetingsController < ApplicationController
               meeting: call.result,
               project: @project,
               copy_from: @copy_from
+            ),
+            status: :bad_request
+          )
+
+          respond_with_turbo_streams
+        end
+      end
+    end
+  end
+
+  def update
+    call = ::RecurringMeetings::UpdateService
+      .new(model: @recurring_meeting, user: current_user)
+      .call(@converted_params)
+
+    if call.success?
+      redirect_back(fallback_location: recurring_meeting_path(call.result), status: :see_other, turbo: false)
+    else
+      respond_to do |format|
+        format.turbo_stream do
+          update_via_turbo_stream(
+            component: Meetings::Index::FormComponent.new(
+              meeting: call.result,
+              project: @project
             ),
             status: :bad_request
           )

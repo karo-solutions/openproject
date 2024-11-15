@@ -30,10 +30,6 @@ module RecurringMeetings
   class CreateContract < BaseContract
     validate :user_allowed_to_add
 
-    # Virtual attributes for the form
-    attribute :duration
-    attribute :location
-
     private
 
     def user_allowed_to_add

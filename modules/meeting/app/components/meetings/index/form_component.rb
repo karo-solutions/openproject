@@ -50,6 +50,14 @@ module Meetings
       end
     end
 
+    def form_method
+      if @meeting.new_record?
+        :post
+      else
+        :put
+      end
+    end
+
     def form_action
       if @meeting.new_record?
         :create

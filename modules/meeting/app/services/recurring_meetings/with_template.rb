@@ -27,24 +27,21 @@
 #++
 
 module RecurringMeetings
-  class BaseContract < ::ModelContract
-    def self.model
-      RecurringMeeting
+  module WithTemplate
+    extend ActiveSupport::Concern
+
+    included do
+      attr_accessor :template_params
+
+      def before_perform(params, _)
+        @template_params = extract_template_params(params)
+
+        super
+      end
+
+      def extract_template_params(params)
+        params.slice(:start_date, :start_time_hour, :title, :location, :duration)
+      end
     end
-
-    attribute :title
-    attribute :author_id
-    attribute :project_id
-    attribute :start_time
-    attribute :start_date
-    attribute :start_time_hour
-    attribute :frequency
-    attribute :end_after
-    attribute :end_date
-    attribute :iterations
-
-    # Virtual attributes for the form
-    attribute :duration
-    attribute :location
   end
 end
