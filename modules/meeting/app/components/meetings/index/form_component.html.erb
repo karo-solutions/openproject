@@ -71,10 +71,10 @@
                                   data: { value: "iterations", "show-when-value-selected-target": "effect" }) do
                 render(RecurringMeeting::Iterations.new(f))
               end
-            end
-
-            modal_body.with_row do
-              render(Meeting::Type.new(f))
+            else
+              modal_body.with_row do
+                render(Meeting::Type.new(f))
+              end
             end
 
             if @copy_from
