@@ -41,7 +41,10 @@ class RecurringMeetingsController < ApplicationController
     end
 
     template_attributes = @recurring_meeting.meetings.where(template: true).first.attributes
-    @recurring_meeting.schedule.all_occurrences.each do |date|
+    @recurring_meeting
+      .schedule
+      .occurrences(@recurring_meeting.end_date)
+      .each do |date|
       exists = meetings.find { |m| m["start_time"] == date }
       unless exists
         attributes = template_attributes.dup
