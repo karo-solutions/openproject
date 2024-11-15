@@ -1335,6 +1335,7 @@ en:
       custom_field: "Custom field"
       "doorkeeper/application": "OAuth application"
       forum: "Forum"
+      gate: "Gate"
       global_role: "Global role"
       group: "Group"
       member: "Member"
@@ -1352,6 +1353,7 @@ en:
         one: "Role"
         other: "Roles"
       status: "Work package status"
+      stage: "Stage"
       token/api:
         one: Access token
         other: Access tokens
