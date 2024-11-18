@@ -35,4 +35,8 @@ class Project::Stage < Project::LifeCycle
       errors.add(:base, :date_not_allowed)
     end
   end
+
+  def not_set?
+    start_date.blank? || end_date.blank?
+  end
 end
