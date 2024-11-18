@@ -1,8 +1,6 @@
-# frozen_string_literal: true
-
 # -- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2010-2024 the OpenProject GmbH
+# Copyright (C) 2024 the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -27,31 +25,21 @@
 #
 # See COPYRIGHT and LICENSE files for more details.
 # ++
-module Projects
-  class LifeCycleTypeComponent < ApplicationComponent
-    include OpPrimer::ComponentHelpers
 
-    def text
-      model.model_name.human
+require "spec_helper"
+
+RSpec.describe ColorsHelper do
+  let(:model) { Data.define(:id).new(5) }
+
+  describe "#hl_inline_class" do
+    it "returns the correct class name" do
+      expect(helper.hl_inline_class("foo_bar", model)).to eq("__hl_inline_foo_bar_5")
     end
+  end
 
-    def icon
-      case model
-      when Stage
-        :"git-commit"
-      when Gate
-        :diamond
-      else
-        raise NotImplementedError, "Unknown model #{model.class} to render a LifeCycleTypeComponent with"
-      end
-    end
-
-    def icon_color_class
-      helpers.hl_inline_class("life_cycle_step_definition", model)
-    end
-
-    def text_options
-      { color: :muted }.merge(options)
+  describe "#hl_background_class" do
+    it "returns the correct class name" do
+      expect(helper.hl_background_class("foo_bar", model)).to eq("__hl_background_foo_bar_5")
     end
   end
 end
