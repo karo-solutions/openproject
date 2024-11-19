@@ -69,7 +69,7 @@ module RecurringMeetings
     end
 
     def page_description
-      "Meeting schedule goes here"
+      @meeting.schedule.to_s # format? translations?
     end
 
     def breadcrumb_items

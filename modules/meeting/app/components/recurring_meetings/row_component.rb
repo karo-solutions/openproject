@@ -40,11 +40,14 @@ module RecurringMeetings
 
     def start_time
       if model["state"] == "open" || model["state"] == "closed"
-        link_to safe_join([helpers.format_date(model["start_time"]), helpers.format_time(model["start_time"], include_date: false)], " "),
-                project_meeting_path(Project.find(model["project_id"]), Meeting.find(model["id"]))
+        link_to start_time_title, project_meeting_path(Project.find(model["project_id"]), Meeting.find(model["id"]))
       else
-        safe_join([helpers.format_date(model["start_time"]), helpers.format_time(model["start_time"], include_date: false)], " ")
+        start_time_title
       end
+    end
+
+    def start_time_title
+      safe_join([helpers.format_date(model["start_time"]), helpers.format_time(model["start_time"], include_date: false)], " ")
     end
 
     def relative_time
@@ -76,7 +79,9 @@ module RecurringMeetings
       if model["state"] != "open"
         render(Primer::Beta::Button.new(
                  scheme: :default,
-                 size: :medium
+                 size: :medium,
+                 tag: :a,
+                 href: init_meeting_path(model.recurring_meeting.template, date: model["start_time"])
                )) do |_c|
           I18n.t("label_recurring_meeting_create")
         end
@@ -98,10 +103,12 @@ module RecurringMeetings
                                 "test-selector": "more-button"
                               })
 
-        ical_action(menu)
+        if initialized?
+          ical_action(menu)
 
-        if delete_allowed?
-          delete_action(menu)
+          if delete_allowed?
+            delete_action(menu)
+          end
         end
       end
     end
@@ -133,6 +140,10 @@ module RecurringMeetings
 
     def copy_allowed?
       User.current.allowed_in_project?(:create_meetings, Project.find(model["project_id"]))
+    end
+
+    def initialized?
+      model["id"].present?
     end
   end
 end

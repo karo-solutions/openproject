@@ -4,8 +4,8 @@ class RecurringMeetingsController < ApplicationController
   include OpTurbo::FlashStreamHelper
   include OpTurbo::DialogStreamHelper
 
-  before_action :find_meeting, only: %i[show update details_dialog]
-  before_action :find_optional_project, only: %i[index show new create update details_dialog]
+  before_action :find_meeting, only: %i[show update details_dialog destroy edit]
+  before_action :find_optional_project, only: %i[index show new create update details_dialog destroy edit]
   before_action :authorize_global, only: %i[index new create]
   before_action :authorize, except: %i[index new create]
 
@@ -51,8 +51,9 @@ class RecurringMeetingsController < ApplicationController
         attributes["start_time"] = date
         attributes["state"] = "scheduled"
         attributes["template"] = false
+        attributes["id"] = nil
+        attributes["start_date"] = DateTime.now.to_s # temp
         meetings << Meeting.new(**attributes)
-        # @recurring_meeting.meetings.build(**attributes)
       end
     end
 
@@ -96,6 +97,10 @@ class RecurringMeetingsController < ApplicationController
     end
   end
 
+  def edit
+    redirect_to controller: "meetings", action: "show", id: @recurring_meeting.template, status: :see_other
+  end
+
   def update
     call = ::RecurringMeetings::UpdateService
       .new(model: @recurring_meeting, user: current_user)
@@ -118,6 +123,13 @@ class RecurringMeetingsController < ApplicationController
         end
       end
     end
+  end
+
+  def destroy
+    @recurring_meeting.destroy
+    flash[:notice] = I18n.t(:notice_successful_delete)
+
+    redirect_to action: "index", project_id: @project
   end
 
   private
