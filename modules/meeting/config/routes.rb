@@ -77,6 +77,7 @@ Rails.application.routes.draw do
       post :notify
       get :history
       get :init
+      get :restore
     end
     resources :agenda_items, controller: "meeting_agenda_items" do
       collection do

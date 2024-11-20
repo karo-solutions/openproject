@@ -74,7 +74,11 @@ class MeetingsController < ApplicationController
       format.html do
         html_title "#{t(:label_meeting)}: #{@meeting.title}"
         if @meeting.is_a?(StructuredMeeting)
-          render(Meetings::ShowComponent.new(meeting: @meeting, project: @project), layout: true)
+          if @meeting.state == "cancelled"
+            render_404
+          else
+            render(Meetings::ShowComponent.new(meeting: @meeting, project: @project), layout: true)
+          end
         elsif @meeting.agenda.present? && @meeting.agenda.locked?
           params[:tab] ||= "minutes"
         end
@@ -187,7 +191,13 @@ class MeetingsController < ApplicationController
 
   def destroy
     type = @meeting.recurring_meeting_id
-    @meeting.destroy
+
+    if type.nil?
+      @meeting.destroy
+    else
+      @meeting.update_attribute :state, :cancelled
+    end
+
     flash[:notice] = I18n.t(:notice_successful_delete)
 
     if type.nil?
@@ -195,6 +205,12 @@ class MeetingsController < ApplicationController
     else
       redirect_to controller: "recurring_meetings", action: "show", id: type, status: :see_other
     end
+  end
+
+  def restore
+    @meeting.update_attribute :state, :open
+
+    redirect_to controller: "recurring_meetings", action: "show", id: @meeting.recurring_meeting_id, status: :see_other
   end
 
   def edit

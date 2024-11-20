@@ -36,6 +36,7 @@ module MeetingAgendaItems
       StructuredMeeting
         .open
         .not_templated
+        .not_cancelled
         .visible(user)
     end
 

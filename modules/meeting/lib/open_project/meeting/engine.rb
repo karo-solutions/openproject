@@ -48,7 +48,7 @@ module OpenProject::Meeting
                      recurring_meetings: %i[index show new create] },
                    permissible_on: :project
         permission :create_meetings,
-                   { meetings: %i[new create copy new_dialog],
+                   { meetings: %i[new create copy new_dialog restore],
                      "meetings/menus": %i[show] },
                    permissible_on: :project,
                    require: :member,

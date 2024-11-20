@@ -55,6 +55,9 @@ class Meeting < ApplicationRecord
   scope :templated, -> { where(template: true) }
   scope :not_templated, -> { where(template: false) }
 
+  scope :cancelled, -> { where(state: :cancelled) }
+  scope :not_cancelled, -> { where.not(id: cancelled) }
+
   scope :from_tomorrow, -> { where(["start_time >= ?", Date.tomorrow.beginning_of_day]) }
   scope :from_today, -> { where(["start_time >= ?", Time.zone.today.beginning_of_day]) }
   scope :with_users_by_date, -> {

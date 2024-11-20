@@ -43,6 +43,7 @@ module Queries::Meetings
     def default_scope
       Meeting
         .not_templated
+        .not_cancelled
         .visible(user)
     end
   end

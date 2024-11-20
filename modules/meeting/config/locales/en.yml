@@ -130,6 +130,7 @@ en:
   label_template: "Template"
   label_recurring_meeting_create: "Create from template"
   label_recurring_meeting_cancel: "Cancel this occurrence"
+  label_recurring_meeting_restore: "Restore this occurrence"
   label_recurring_meeting_series_edit: "Edit meeting series"
   label_recurring_meeting_series_delete: "Delete meeting series"
   label_upcoming_meetings: "Upcoming meetings"

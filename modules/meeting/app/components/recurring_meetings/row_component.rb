@@ -76,7 +76,7 @@ module RecurringMeetings
     end
 
     def create
-      if model["state"] != "open"
+      if model["state"] == "scheduled"
         render(Primer::Beta::Button.new(
                  scheme: :default,
                  size: :medium,
@@ -103,12 +103,16 @@ module RecurringMeetings
                                 "test-selector": "more-button"
                               })
 
-        if initialized?
+        if initialized? && !cancelled?
           ical_action(menu)
 
           if delete_allowed?
             delete_action(menu)
           end
+        end
+
+        if cancelled?
+          restore_action(menu)
         end
       end
     end
@@ -134,6 +138,13 @@ module RecurringMeetings
       end
     end
 
+    def restore_action(menu)
+      menu.with_item(label: I18n.t(:label_recurring_meeting_restore),
+                     href: restore_meeting_path(Meeting.find(model["id"]))) do |item|
+        item.with_leading_visual_icon(icon: :history)
+      end
+    end
+
     def delete_allowed?
       User.current.allowed_in_project?(:delete_meetings, Project.find(model["project_id"]))
     end
@@ -144,6 +155,10 @@ module RecurringMeetings
 
     def initialized?
       model["id"].present?
+    end
+
+    def cancelled?
+      model["state"] == "cancelled"
     end
   end
 end
