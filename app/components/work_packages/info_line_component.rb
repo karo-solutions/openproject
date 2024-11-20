@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class WorkPackages::WorkPackageInfoLineComponent < ApplicationComponent
+class WorkPackages::InfoLineComponent < ApplicationComponent
   include OpPrimer::ComponentHelpers
 
   def initialize(id:)
