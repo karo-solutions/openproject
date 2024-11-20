@@ -3,9 +3,9 @@
 class WorkPackages::InfoLineComponent < ApplicationComponent
   include OpPrimer::ComponentHelpers
 
-  def initialize(id:)
+  def initialize(work_package:)
     super
 
-    @work_package = WorkPackage.visible.find_by(id:)
+    @work_package = work_package
   end
 end
