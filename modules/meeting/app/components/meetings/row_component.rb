@@ -43,11 +43,19 @@ module Meetings
     end
 
     def title
-      safe_join([(link_to model.title, project_meeting_path(model.project, model)), recurring_label], "  ")
+      if recurring?
+        link_to model.title, recurring_meeting_path(model)
+      else
+        safe_join([(link_to model.title, project_meeting_path(model.project, model)), recurring_label], "  ")
+      end
     end
 
     def start_time
-      safe_join([helpers.format_date(model.start_time), helpers.format_time(model.start_time, include_date: false)], " ")
+      if recurring?
+        helpers.format_time(model.start_time, include_date: false)
+      else
+        safe_join([helpers.format_date(model.start_time), helpers.format_time(model.start_time, include_date: false)], " ")
+      end
     end
 
     def duration
@@ -55,9 +63,15 @@ module Meetings
     end
 
     def location
-      helpers.auto_link(model.location,
+      helpers.auto_link(recurring? ? model.template.location : model.location,
                         link: :all,
                         html: { target: "_blank" })
+    end
+
+    def frequency
+      return unless recurring?
+
+      model.human_frequency
     end
 
     def button_links
@@ -74,11 +88,11 @@ module Meetings
                               data: {
                                 "test-selector": "more-button"
                               })
-        if copy_allowed?
+        if copy_allowed? && !recurring?
           copy_action(menu)
         end
 
-        ical_action(menu)
+        ical_action(menu) unless recurring?
 
         if delete_allowed?
           delete_action(menu)
@@ -121,7 +135,9 @@ module Meetings
     end
 
     def recurring_label
-      if model.recurring_meeting.present?
+      if recurring?
+        render(Primer::Beta::Label.new) { model.human_frequency }
+      elsif model.recurring_meeting.present?
         render(Primer::Beta::Label.new) { model.recurring_meeting.human_frequency }
       end
     end
@@ -132,6 +148,10 @@ module Meetings
 
     def copy_allowed?
       User.current.allowed_in_project?(:create_meetings, model.project)
+    end
+
+    def recurring?
+      model.is_a?(RecurringMeeting)
     end
   end
 end

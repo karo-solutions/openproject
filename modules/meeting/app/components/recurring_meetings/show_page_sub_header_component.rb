@@ -30,7 +30,7 @@
 
 module RecurringMeetings
   # rubocop:disable OpenProject/AddPreviewForViewComponent
-  class IndexSubHeaderComponent < ApplicationComponent
+  class ShowPageSubHeaderComponent < ApplicationComponent
     # rubocop:enable OpenProject/AddPreviewForViewComponent
     include ApplicationHelper
 

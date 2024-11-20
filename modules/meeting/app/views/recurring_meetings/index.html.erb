@@ -33,7 +33,5 @@ See COPYRIGHT and LICENSE files for more details.
 <% if @recurring_meetings.empty? -%>
   <%= no_results_box %>
 <% else -%>
-  <% @recurring_meetings.each do |meeting| %>
-    <%= link_to meeting.title, recurring_meeting_path(meeting) %>
-  <% end %>
+  <%= render Meetings::TableComponent.new(rows: @recurring_meetings, current_project: @project) %>
 <% end -%>

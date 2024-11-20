@@ -29,7 +29,7 @@
 # ++
 
 module RecurringMeetings
-  class IndexPageHeaderComponent < ApplicationComponent
+  class ShowPageHeaderComponent < ApplicationComponent
     include OpPrimer::ComponentHelpers
     include ApplicationHelper
 
