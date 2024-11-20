@@ -43,7 +43,7 @@ module Meetings
     end
 
     def title
-      link_to model.title, project_meeting_path(model.project, model)
+      safe_join([(link_to model.title, project_meeting_path(model.project, model)), recurring_label], "  ")
     end
 
     def start_time
@@ -117,6 +117,12 @@ module Meetings
                        method: :delete, data: { confirm: I18n.t("text_are_you_sure"), turbo: false }
                      }) do |item|
         item.with_leading_visual_icon(icon: :trash)
+      end
+    end
+
+    def recurring_label
+      if model.recurring_meeting.present?
+        render(Primer::Beta::Label.new) { model.recurring_meeting.human_frequency }
       end
     end
 
