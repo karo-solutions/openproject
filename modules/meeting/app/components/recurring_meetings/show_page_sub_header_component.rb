@@ -34,10 +34,12 @@ module RecurringMeetings
     # rubocop:enable OpenProject/AddPreviewForViewComponent
     include ApplicationHelper
 
-    def initialize(query: nil, project: nil)
+    def initialize(meeting:, project: nil, params:)
       super
-      @query = query
+
+      @meeting = meeting
       @project = project
+      @params = params
     end
 
     def dynamic_path

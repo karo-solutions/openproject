@@ -1,5 +1,6 @@
 class RecurringMeetingsController < ApplicationController
   include Layout
+  include PaginationHelper
   include OpTurbo::ComponentStream
   include OpTurbo::FlashStreamHelper
   include OpTurbo::DialogStreamHelper
@@ -27,20 +28,29 @@ class RecurringMeetingsController < ApplicationController
   end
 
   def show
-    @meetings = collect_meetings(true)
+    @direction = params[:direction]
+    if params[:direction] == "past"
+      @meetings = @recurring_meeting
+        .instances(upcoming: false)
+        .page(page_param)
+        .per_page(per_page_param)
+    else
+      @meetings = upcoming_meetings
+      @total_count = @recurring_meeting.remaining_occurrences.count - @meetings.count
+    end
 
     respond_to do |format|
       format.html
     end
   end
 
-  def collect_meetings(upcoming)
+  def upcoming_meetings
     meetings = @recurring_meeting
-      .instances(upcoming:)
+      .instances(upcoming: true)
       .index_by(&:start_date)
 
     @recurring_meeting
-      .scheduled_occurrences(count: meetings.count + 5, upcoming:)
+      .scheduled_occurrences(limit: meetings.count + 5)
       .map do |occurrence|
       date = occurrence.to_date
       meetings[date.to_s] || skeleton_meeting(date)

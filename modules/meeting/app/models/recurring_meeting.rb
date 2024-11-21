@@ -53,16 +53,22 @@ class RecurringMeeting < ApplicationRecord
   end
 
   def schedule
-    IceCube::Schedule.new(start_time, end_time: end_date).tap do |s|
-      s.add_recurrence_rule count_rule(frequency_rule)
+    @schedule ||= begin
+      IceCube::Schedule.new(start_time, end_time: end_date).tap do |s|
+        s.add_recurrence_rule count_rule(frequency_rule)
+      end
     end
   end
 
-  def scheduled_occurrences(count:, upcoming: true)
-    if upcoming
-      schedule.next_occurrences(count, Time.current)
+  def scheduled_occurrences(limit:)
+    schedule.next_occurrences(limit, Time.current)
+  end
+
+  def remaining_occurrences
+    if end_date.present?
+      schedule.occurrences_between(Time.current, end_date)
     else
-      schedule.previous_occurrences(count, Time.current)
+      schedule.remaining_occurrences(Time.current)
     end
   end
 
