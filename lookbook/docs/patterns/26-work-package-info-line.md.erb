@@ -1,5 +1,9 @@
 The work package info line is a consistent way to display the most commonly-used  set of basic work package attributes.
 
+## Overview
+
+<%= embed OpenProject::WorkPackages::InfoLineComponentPreview, :playground %>
+
 ## Anatomy
 
 The info line consists of three attributes that are displayed together:
@@ -21,9 +25,10 @@ It's best to not separate these three elements in different lines. The element c
 - Work package header
 - ...
 
-## Technical notes
-
-
 ### Code structure
 
-[CODE EXAMPLE HERE]
+You can typically call the InfoLineComponent in views where work package details (Type, ID, and Status) need to be displayed in one line. You must pass a work package object containing valid data to it.
+
+```html
+    render(WorkPackages::InfoLineComponent.new(work_package: @work_package))
+```
