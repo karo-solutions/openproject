@@ -30,6 +30,14 @@
 
 module RecurringMeetings
   class RowComponent < ::OpPrimer::BorderBoxRowComponent
+    def meeting
+      model
+    end
+
+    def instantiated?
+      meeting.is_a?(Meeting)
+    end
+
     def column_args(column)
       if column == :title
         { style: "grid-column: span 2" }
@@ -39,52 +47,59 @@ module RecurringMeetings
     end
 
     def start_time
-      if model["state"] == "open" || model["state"] == "closed"
-        link_to start_time_title, project_meeting_path(Project.find(model["project_id"]), Meeting.find(model["id"]))
+      if instantiated?
+        link_to start_time_title, meeting_path(meeting)
       else
         start_time_title
       end
     end
 
     def start_time_title
-      safe_join([helpers.format_date(model["start_time"]), helpers.format_time(model["start_time"], include_date: false)], " ")
+      helpers.format_time(meeting.start_time, include_date: true)
     end
 
     def relative_time
-      render(OpPrimer::RelativeTimeComponent.new(datetime: model["start_time"], prefix: I18n.t(:label_on)))
+      render(OpPrimer::RelativeTimeComponent.new(datetime: meeting.start_time, prefix: I18n.t(:label_on)))
     end
 
     def last_edited
-      safe_join([helpers.format_date(model["updated_at"]), helpers.format_time(model["updated_at"], include_date: false)], " ")
+      return unless instantiated?
+
+      helpers.format_time(meeting.updated_at, include_date: true)
     end
 
     def status
-      case model["state"]
-      when "open"
-        scheme = :success
-      when "scheduled"
-        scheme = :secondary
-      when "cancelled"
-        scheme = :severe
-      when "closed"
-        scheme = :secondary
-      end
+      state = instantiated? ? model.state : :scheduled
+      scheme = status_scheme(state)
 
       render(Primer::Beta::Label.new(scheme:)) do
-        render(Primer::Beta::Text.new) { t("label_meeting_state_#{model['state']}") }
+        render(Primer::Beta::Text.new) { t("label_meeting_state_#{state}") }
+      end
+    end
+
+    def status_scheme(state)
+      case state
+      when "open"
+        :success
+      when "cancelled"
+        :severe
+      else
+        :secondary
       end
     end
 
     def create
-      if model["state"] == "scheduled"
-        render(Primer::Beta::Button.new(
-                 scheme: :default,
-                 size: :medium,
-                 tag: :a,
-                 href: init_meeting_path(model.recurring_meeting.template, date: model["start_time"])
-               )) do |_c|
-          I18n.t("label_recurring_meeting_create")
-        end
+      return if instantiated?
+
+      render(
+        Primer::Beta::Button.new(
+          scheme: :default,
+          size: :medium,
+          tag: :a,
+          href: init_meeting_path(model.recurring_meeting.id, start_time: model.start_time)
+        )
+      ) do |_c|
+        I18n.t("label_recurring_meeting_create")
       end
     end
 
@@ -103,7 +118,7 @@ module RecurringMeetings
                                 "test-selector": "more-button"
                               })
 
-        if initialized? && !cancelled?
+        if instantiated? && !cancelled?
           ical_action(menu)
 
           if delete_allowed?
@@ -153,12 +168,8 @@ module RecurringMeetings
       User.current.allowed_in_project?(:create_meetings, Project.find(model["project_id"]))
     end
 
-    def initialized?
-      model["id"].present?
-    end
-
     def cancelled?
-      model["state"] == "cancelled"
+      instantiated? && model.cancelled?
     end
   end
 end

@@ -60,6 +60,10 @@ class Meeting < ApplicationRecord
 
   scope :from_tomorrow, -> { where(["start_time >= ?", Date.tomorrow.beginning_of_day]) }
   scope :from_today, -> { where(["start_time >= ?", Time.zone.today.beginning_of_day]) }
+
+  scope :upcoming, -> { where("start_time + (interval '1 hour' * duration) >= ?", Time.current) }
+  scope :past, -> { where("start_time + (interval '1 hour' * duration) < ?", Time.current) }
+
   scope :with_users_by_date, -> {
     order("#{Meeting.table_name}.title ASC")
       .includes({ participants: :user }, :author)

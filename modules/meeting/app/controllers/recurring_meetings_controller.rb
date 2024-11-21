@@ -27,42 +27,29 @@ class RecurringMeetingsController < ApplicationController
   end
 
   def show
-    @meetings = collect_meetings
+    @meetings = collect_meetings(true)
 
     respond_to do |format|
       format.html
     end
   end
 
-  def collect_meetings
-    meetings = []
-    @recurring_meeting.meetings.each do |meeting|
-      meetings << meeting unless meeting.template == true
-    end
+  def collect_meetings(upcoming)
+    meetings = @recurring_meeting
+      .instances(upcoming:)
+      .index_by(&:start_date)
 
-    template_attributes = @recurring_meeting.meetings.where(template: true).first.attributes
     @recurring_meeting
-      .schedule
-      .occurrences(@recurring_meeting.end_date)
-      .each do |date|
-      exists = meetings.find { |m| m["start_time"] == date }
-      unless exists
-        attributes = template_attributes.dup
-        attributes["start_time"] = date
-        attributes["state"] = "scheduled"
-        attributes["template"] = false
-        attributes["id"] = nil
-        attributes["start_date"] = DateTime.now.to_s # temp
-        meetings << Meeting.new(**attributes)
-      end
+      .scheduled_occurrences(count: meetings.count + 5, upcoming:)
+      .map do |occurrence|
+      date = occurrence.to_date
+      meetings[date.to_s] || skeleton_meeting(date)
     end
+  end
 
-    # SELECT COALESCE(meetings.start_time, meetings.recurring_date) start_time_test FROM
-    # (SELECT * FROM (VALUES (to_timestamp('2024-10-06 11:30:00', 'YYYY-MM-DD HH24:MI:SS'), 'ABC'),
-    # (to_timestamp('2024-10-06 11:30:00', 'YYYY-MM-DD HH24:MI:SS'), 'ABC')) AS t (recurring_date, recurring_title)
-    # FULL JOIN meetings ON meetings.start_time = t.recurring_date) meetings ORDER BY start_time_test;
-
-    meetings
+  def skeleton_meeting(date)
+    start_time = @recurring_meeting.start_time.change(year: date.year, month: date.month, day: date.day)
+    RecurringMeetings::Skeleton.new(start_time:, recurring_meeting: @recurring_meeting)
   end
 
   def details_dialog

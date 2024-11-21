@@ -58,6 +58,22 @@ class RecurringMeeting < ApplicationRecord
     end
   end
 
+  def scheduled_occurrences(count:, upcoming: true)
+    if upcoming
+      schedule.next_occurrences(count, Time.current)
+    else
+      schedule.previous_occurrences(count, Time.current)
+    end
+  end
+
+  def instances(upcoming: true)
+    direction = upcoming ? :upcoming : :past
+
+    meetings
+      .not_templated
+      .public_send(direction)
+  end
+
   private
 
   def frequency_rule
