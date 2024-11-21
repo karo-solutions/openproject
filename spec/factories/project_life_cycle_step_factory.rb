@@ -27,15 +27,19 @@
 #++
 
 FactoryBot.define do
-  factory :life_cycle do
-    color
+  factory :project_life_cycle_step, class: "Project::LifeCycleStep" do
+    project
+    active { true }
 
-    factory :gate, class: "Gate" do
-      sequence(:name) { |n| "Gate No. #{n}" }
+    factory :project_stage, class: "Project::Stage" do
+      definition factory: :project_stage_definition
+      start_date { Date.current - 2.days }
+      end_date { Date.current + 2.days }
     end
 
-    factory :stage, class: "Stage" do
-      sequence(:name) { |n| "Stage No. #{n}" }
+    factory :project_gate, class: "Project::Gate" do
+      definition factory: :project_gate_definition
+      date { Date.current + 2.days }
     end
   end
 end

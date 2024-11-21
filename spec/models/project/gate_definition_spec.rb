@@ -25,22 +25,10 @@
 #
 # See COPYRIGHT and LICENSE files for more details.
 #++
-module BasicData
-  class LifeCycleSeeder < ModelSeeder
-    self.model_class = LifeCycle
-    self.seed_data_model_key = "life_cycles"
-    self.needs = [
-      BasicData::LifeCycleColorSeeder
-    ]
 
-    self.attribute_names_for_lookups = %i[name type]
+require "rails_helper"
+require "support/shared/project_life_cycle_helpers"
 
-    def model_attributes(life_cyle_data)
-      {
-        name: life_cyle_data["name"],
-        type: life_cyle_data["type"],
-        color_id: color_id(life_cyle_data["color_name"])
-      }
-    end
-  end
+RSpec.describe Project::GateDefinition do
+  it_behaves_like "a Project::LifeCycleStepDefinition event"
 end

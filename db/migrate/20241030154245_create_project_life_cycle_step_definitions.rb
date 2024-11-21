@@ -26,22 +26,14 @@
 # See COPYRIGHT and LICENSE files for more details.
 #++
 
-class LifeCycle < ApplicationRecord
-  has_many :project_life_cycles, class_name: "Project::LifeCycle", dependent: :destroy
-  has_many :projects, through: :project_life_cycles
+class CreateProjectLifeCycleStepDefinitions < ActiveRecord::Migration[7.1]
+  def change
+    create_table :project_life_cycle_step_definitions do |t|
+      t.string :type
+      t.string :name
+      t.references :color, foreign_key: true
 
-  belongs_to :color, optional: false
-
-  validates :name, presence: true
-  validates :type, inclusion: { in: %w[Stage Gate], message: :must_be_a_stage_or_gate }
-
-  def initialize(*args)
-    if instance_of? LifeCycle
-      # Do not allow directly instantiating this class
-      raise NotImplementedError, "Cannot instantiate the base LifeCycle class directly. " \
-                                 "Use Stage or Gate instead."
+      t.timestamps
     end
-
-    super
   end
 end

@@ -25,15 +25,22 @@
 #
 # See COPYRIGHT and LICENSE files for more details.
 #++
+module BasicData
+  class LifeCycleStepDefinitionSeeder < ModelSeeder
+    self.model_class = Project::LifeCycleStepDefinition
+    self.seed_data_model_key = "life_cycles"
+    self.needs = [
+      BasicData::LifeCycleColorSeeder
+    ]
 
-class CreateLifeCycles < ActiveRecord::Migration[7.1]
-  def change
-    create_table :life_cycles do |t|
-      t.string :type
-      t.string :name
-      t.references :color, foreign_key: true
+    self.attribute_names_for_lookups = %i[name type]
 
-      t.timestamps
+    def model_attributes(life_cyle_data)
+      {
+        name: life_cyle_data["name"],
+        type: life_cyle_data["type"],
+        color_id: color_id(life_cyle_data["color_name"])
+      }
     end
   end
 end

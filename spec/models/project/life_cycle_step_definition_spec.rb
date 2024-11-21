@@ -26,20 +26,15 @@
 # See COPYRIGHT and LICENSE files for more details.
 #++
 
-FactoryBot.define do
-  factory :project_life_cycle, class: "Project::LifeCycle" do
-    project
-    active { true }
+require "rails_helper"
 
-    factory :project_stage, class: "Project::Stage" do
-      life_cycle factory: :stage
-      start_date { Date.current - 2.days }
-      end_date { Date.current + 2.days }
-    end
-
-    factory :project_gate, class: "Project::Gate" do
-      life_cycle factory: :gate
-      date { Date.current + 2.days }
-    end
+RSpec.describe Project::LifeCycleStepDefinition do
+  it "cannot be instantiated" do
+    expect { described_class.new }.to raise_error(NotImplementedError)
   end
+
+  # For more specs see:
+  # - spec/support/shared/project_life_cycle_helpers.rb
+  # - spec/models/project/gate_definition_spec.rb
+  # - spec/models/project/stage_definition_spec.rb
 end

@@ -27,8 +27,8 @@
 #++
 
 require "rails_helper"
-require "support/shared/life_cycle_helpers"
+require "support/shared/project_life_cycle_helpers"
 
-RSpec.describe Stage do
-  it_behaves_like "a LifeCycle event"
+RSpec.describe Project::StageDefinition do
+  it_behaves_like "a Project::LifeCycleStepDefinition event"
 end

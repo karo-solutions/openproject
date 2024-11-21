@@ -26,25 +26,35 @@
 # See COPYRIGHT and LICENSE files for more details.
 #++
 
-RSpec.shared_examples_for "a LifeCycle event" do
-  it "inherits from LifeCycle" do
-    expect(described_class).to be < LifeCycle
+require "rails_helper"
+
+RSpec.describe Project::LifeCycleStep do
+  it "cannot be instantiated" do
+    expect { described_class.new }.to raise_error(NotImplementedError)
   end
 
-  describe "associations" do
-    it { is_expected.to have_many(:project_life_cycles).dependent(:destroy) }
-    it { is_expected.to have_many(:projects).through(:project_life_cycles) }
-    it { is_expected.to belong_to(:color).required }
-  end
+  describe "with an instantiated Gate" do
+    subject { build :project_gate }
 
-  describe "validations" do
-    it { is_expected.to validate_presence_of(:name) }
+    it "allows setting a life_cycle" do
+      expected_life_cycle_definition = create :project_gate_definition
+      subject.definition = expected_life_cycle_definition
 
-    it "is invalid if type is not Stage or Gate" do
-      life_cycle = described_class.new
-      life_cycle.type = "InvalidType"
-      expect(life_cycle).not_to be_valid
-      expect(life_cycle.errors[:type]).to include("must be either Stage or Gate")
+      expect(subject.save).to be(true)
+      expect(subject.reload.definition).to eq(expected_life_cycle_definition)
+    end
+
+    context "when the Gate is already saved" do
+      subject { create :project_gate }
+
+      it "does not allow updating the life cycle definition" do
+        expect(subject).to have_readonly_attribute(:definition_id)
+      end
     end
   end
+
+  # For more specs see:
+  # - spec/support/shared/project_life_cycle_helpers.rb
+  # - spec/models/project/gate_spec.rb
+  # - spec/models/project/stage_spec.rb
 end

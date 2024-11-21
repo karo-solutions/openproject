@@ -26,15 +26,9 @@
 # See COPYRIGHT and LICENSE files for more details.
 #++
 
-require "rails_helper"
-
-RSpec.describe LifeCycle do
-  it "cannot be instantiated" do
-    expect { described_class.new }.to raise_error(NotImplementedError)
-  end
-
-  # For more specs see:
-  # - spec/support/shared/life_cycle_helpers.rb
-  # - spec/models/gate_spec.rb
-  # - spec/models/stage_spec.rb
+class Project::GateDefinition < Project::LifeCycleStepDefinition
+  has_many :gates, # Alias for life_cycle_steps
+           class_name: "Project::Gate",
+           foreign_key: :definition_id,
+           dependent: :destroy
 end

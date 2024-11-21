@@ -26,35 +26,25 @@
 # See COPYRIGHT and LICENSE files for more details.
 #++
 
-require "rails_helper"
+class Project::LifeCycleStepDefinition < ApplicationRecord
+  has_many :life_cycle_steps,
+           class_name: "Project::LifeCycleStep",
+           foreign_key: :definition_id,
+           dependent: :destroy
+  has_many :projects, through: :life_cycle_steps
 
-RSpec.describe Project::LifeCycle do
-  it "cannot be instantiated" do
-    expect { described_class.new }.to raise_error(NotImplementedError)
-  end
+  belongs_to :color, optional: false
 
-  describe "with an instantiated Gate" do
-    subject { build :project_gate }
+  validates :name, presence: true
+  validates :type, inclusion: { in: %w[Project::StageDefinition Project::GateDefinition], message: :must_be_a_stage_or_gate }
 
-    it "allows setting a life_cycle" do
-      expected_life_cycle = create :gate
-      subject.life_cycle = expected_life_cycle
-
-      expect(subject.save).to be(true)
-      expect(subject.reload.life_cycle).to eq(expected_life_cycle)
+  def initialize(*args)
+    if instance_of? Project::LifeCycleStepDefinition
+      # Do not allow directly instantiating this class
+      raise NotImplementedError, "Cannot instantiate the base Project::LifeCycleStepDefinition class directly. " \
+                                 "Use Project::StageDefinition or Project::GateDefinition instead."
     end
 
-    context "when the Gate is already saved" do
-      subject { create :project_gate }
-
-      it "does not allow updating the life_cycle" do
-        expect(subject).to have_readonly_attribute(:life_cycle_id)
-      end
-    end
+    super
   end
-
-  # For more specs see:
-  # - spec/support/shared/project_life_cycle_helpers.rb
-  # - spec/models/project/gate_spec.rb
-  # - spec/models/project/stage_spec.rb
 end
