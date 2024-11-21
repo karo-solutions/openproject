@@ -2,13 +2,25 @@
   header.with_title { page_title }
   header.with_description { page_description }
   header.with_breadcrumbs(breadcrumb_items)
+
+  header.with_action_button(
+    tag: :a,
+    mobile_label: I18n.t("recurring_meeting.template.label_edit_template"),
+    mobile_icon: :pencil,
+    size: :medium,
+    href: meeting_path(@meeting.template)
+  ) do |button|
+    button.with_leading_visual_icon(icon: :pencil)
+    I18n.t("recurring_meeting.template.label_edit_template")
+  end
+
   if render_create_button?
     header.with_action_menu(menu_arguments: { anchor_align: :end },
                             button_arguments: { icon: "op-kebab-vertical",
                                                 classes: "hide-when-print",
                                                 "aria-label": "Menu" }) do |menu, _button|
-      menu.with_item(label:  I18n.t(:label_recurring_meeting_series_edit), href: edit_recurring_meeting_path(@meeting))
-      menu.with_item(label:  I18n.t(:label_recurring_meeting_series_delete),
+      menu.with_item(label: I18n.t(:label_recurring_meeting_series_edit), href: edit_recurring_meeting_path(@meeting))
+      menu.with_item(label: I18n.t(:label_recurring_meeting_series_delete),
                      href: recurring_meeting_path(@meeting),
                      scheme: :danger,
                      form_arguments: {

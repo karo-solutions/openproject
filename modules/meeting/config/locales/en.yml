@@ -196,6 +196,7 @@ en:
 
   recurring_meeting:
     template:
+      label_edit_template: "Edit template"
       banner_html: >
         You are currently editing a template of a meeting series: %{link}.
         Every new instance of a meeting in this series will use this template.
