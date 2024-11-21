@@ -42,13 +42,9 @@ module Meetings
       self.contract_class = contract_class
     end
 
-    def call(send_notifications: nil, save: true, copy_agenda: true, copy_attachments: false, attach_to_recurring: false, attributes: {})
+    def call(send_notifications: nil, save: true, copy_agenda: true, copy_attachments: false, attributes: {})
       if save
-        if attach_to_recurring
-          create_recurring(meeting, attributes)
-        else
-          create(meeting, attributes, send_notifications:, copy_agenda:, copy_attachments:, attach_to_recurring:)
-        end
+        create(meeting, attributes, send_notifications:, copy_agenda:, copy_attachments:)
       else
         build(meeting, attributes)
       end
@@ -56,24 +52,13 @@ module Meetings
 
     protected
 
-    def create(meeting, attribute_overrides, send_notifications:, copy_agenda:, copy_attachments:, attach_to_recurring:)
+    def create(meeting, attribute_overrides, send_notifications:, copy_agenda:, copy_attachments:)
       Meetings::CreateService
         .new(user:, contract_class:)
         .call(**copied_attributes(meeting, attribute_overrides).merge(send_notifications:).symbolize_keys)
         .on_success do |call|
         copy_meeting_agenda(call.result) if copy_agenda
         copy_meeting_attachment(call.result) if copy_attachments
-        attach_to_recurring(call.result) if attach_to_recurring
-      end
-    end
-
-    def create_recurring(meeting, attributes)
-      Meetings::CreateService.new(user:, contract_class:)
-        .call(meeting.attributes.slice(*writable_meeting_attributes(meeting)).merge("start_time" => DateTime.parse(attributes["date"])).merge(send_notifications: false).symbolize_keys)
-        .on_success do |call|
-        copy_meeting_agenda(call.result)
-        copy_meeting_attachment(call.result)
-        attach_to_recurring(call.result)
       end
     end
 
@@ -151,11 +136,6 @@ module Meetings
         copied_participant.meeting_id = copy.id
         copy.participants << copied_participant
       end
-    end
-
-    def attach_to_recurring(copy)
-      copy.recurring_meeting = meeting.recurring_meeting
-      copy.save! # ?
     end
   end
 end

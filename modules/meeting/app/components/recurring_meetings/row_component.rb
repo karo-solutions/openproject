@@ -96,7 +96,8 @@ module RecurringMeetings
           scheme: :default,
           size: :medium,
           tag: :a,
-          href: init_meeting_path(model.recurring_meeting.id, start_time: model.start_time)
+          data: { "turbo-method": "post"},
+          href: init_recurring_meeting_path(model.recurring_meeting.id, start_time: model.start_time)
         )
       ) do |_c|
         I18n.t("label_recurring_meeting_create")

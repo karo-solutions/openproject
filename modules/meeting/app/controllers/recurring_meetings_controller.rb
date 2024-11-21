@@ -5,7 +5,7 @@ class RecurringMeetingsController < ApplicationController
   include OpTurbo::FlashStreamHelper
   include OpTurbo::DialogStreamHelper
 
-  before_action :find_meeting, only: %i[show update details_dialog destroy edit]
+  before_action :find_meeting, only: %i[show update details_dialog destroy edit init]
   before_action :find_optional_project, only: %i[index show new create update details_dialog destroy edit]
   before_action :authorize_global, only: %i[index new create]
   before_action :authorize, except: %i[index new create]
@@ -21,13 +21,19 @@ class RecurringMeetingsController < ApplicationController
       else
         RecurringMeeting.visible
       end
+
+    respond_to do |format|
+      format.html do
+        render :index, locals: { menu_name: project_or_global_menu }
+      end
+    end
   end
 
   def new
     @recurring_meeting = RecurringMeeting.new(project: @project)
   end
 
-  def show
+  def show # rubocop:disable Metrics/AbcSize
     @direction = params[:direction]
     if params[:direction] == "past"
       @meetings = @recurring_meeting
@@ -40,26 +46,25 @@ class RecurringMeetingsController < ApplicationController
     end
 
     respond_to do |format|
-      format.html
+      format.html do
+        render :show, locals: { menu_name: project_or_global_menu }
+      end
     end
   end
 
-  def upcoming_meetings
-    meetings = @recurring_meeting
-      .instances(upcoming: true)
-      .index_by(&:start_date)
-
-    @recurring_meeting
-      .scheduled_occurrences(limit: meetings.count + 5)
-      .map do |occurrence|
-      date = occurrence.to_date
-      meetings[date.to_s] || skeleton_meeting(date)
+  def init
+    call = ::Meetings::CopyService
+      .new(user: current_user, model: @recurring_meeting.template)
+      .call(attributes: init_params,
+            copy_agenda: true,
+            copy_attachments: true,
+            send_notifications: false)
+    if call.success?
+      redirect_to project_meeting_path(call.result.project, call.result), status: :see_other
+    else
+      flash[:error] = call.message
+      redirect_to action: :show, id: @recurring_meeting
     end
-  end
-
-  def skeleton_meeting(date)
-    start_time = @recurring_meeting.start_time.change(year: date.year, month: date.month, day: date.day)
-    RecurringMeetings::Skeleton.new(start_time:, recurring_meeting: @recurring_meeting)
   end
 
   def details_dialog
@@ -130,6 +135,34 @@ class RecurringMeetingsController < ApplicationController
   end
 
   private
+
+  def init_params
+    {
+      start_time: DateTime.parse(params[:start_time]),
+      recurring_meeting: @recurring_meeting
+    }
+  end
+
+  def upcoming_meetings
+    meetings = @recurring_meeting
+      .instances(upcoming: true)
+      .index_by(&:start_date)
+
+    merged = @recurring_meeting
+      .scheduled_occurrences(limit: 5)
+      .map do |occurrence|
+      date = occurrence.to_date
+      meetings.delete(date.to_s) || skeleton_meeting(date)
+    end
+
+    # Ensure we keep any remaining future meetings that exceed the limit
+    merged + meetings.values.sort_by(&:start_date)
+  end
+
+  def skeleton_meeting(date)
+    start_time = @recurring_meeting.start_time.change(year: date.year, month: date.month, day: date.day)
+    RecurringMeetings::Skeleton.new(start_time:, recurring_meeting: @recurring_meeting)
+  end
 
   def find_optional_project
     @project = Project.find(params[:project_id]) if params[:project_id].present?

@@ -88,5 +88,13 @@ module Meetings
         { href: home_path, text: helpers.organization_name }
       end
     end
+
+    def delete_label
+      if @meeting.recurring_meeting.present?
+        I18n.t("label_recurring_meeting_cancel")
+      else
+        I18n.t("label_meeting_delete")
+      end
+    end
   end
 end

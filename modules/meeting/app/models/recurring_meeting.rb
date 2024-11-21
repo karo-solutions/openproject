@@ -78,6 +78,7 @@ class RecurringMeeting < ApplicationRecord
     meetings
       .not_templated
       .public_send(direction)
+      .order(start_time: :asc)
   end
 
   private

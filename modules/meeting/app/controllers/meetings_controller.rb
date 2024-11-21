@@ -27,7 +27,7 @@
 #++
 
 class MeetingsController < ApplicationController
-  before_action :load_and_authorize_in_optional_project, only: %i[index new new_dialog show create history init]
+  before_action :load_and_authorize_in_optional_project, only: %i[index new new_dialog show create history]
   before_action :verify_activities_module_activated, only: %i[history]
   before_action :determine_date_range, only: %i[history]
   before_action :determine_author, only: %i[history]
@@ -36,9 +36,9 @@ class MeetingsController < ApplicationController
   before_action :set_activity, only: %i[history]
   before_action :find_copy_from_meeting, only: %i[create]
   before_action :convert_params, only: %i[create update update_participants]
-  before_action :authorize, except: %i[index new create update_title update_details update_participants change_state new_dialog init]
+  before_action :authorize, except: %i[index new create update_title update_details update_participants change_state new_dialog]
   before_action :authorize_global,
-                only: %i[index new create update_title update_details update_participants change_state new_dialog init]
+                only: %i[index new create update_title update_details update_participants change_state new_dialog]
   before_action :prevent_template_destruction, only: :destroy
 
   helper :watchers
@@ -91,17 +91,6 @@ class MeetingsController < ApplicationController
       head :no_content
     else
       respond_with_flash(Meetings::UpdateFlashComponent.new(@meeting))
-    end
-  end
-
-  def init
-    call =  ::Meetings::CopyService
-              .new(user: current_user, model: @meeting)
-              .call(attributes: params, attach_to_recurring: true)
-    if call.success?
-      redirect_to controller: "recurring_meetings", action: "show", id: @meeting.recurring_meeting_id, status: :see_other
-    else
-      # Flash + redirect?
     end
   end
 

@@ -59,6 +59,7 @@ Rails.application.routes.draw do
   resources :recurring_meetings do
     member do
       get :details_dialog
+      post :init
     end
   end
 
@@ -76,7 +77,6 @@ Rails.application.routes.draw do
       put :change_state
       post :notify
       get :history
-      get :init
       get :restore
     end
     resources :agenda_items, controller: "meeting_agenda_items" do
