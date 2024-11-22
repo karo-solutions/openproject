@@ -36,7 +36,7 @@
           details.with_row(mt: 2) do
             render_meeting_attribute_row(:calendar) do
               render(Primer::Beta::Text.new) do
-                @meeting.recurring_meeting.human_date_of_week
+                @meeting.recurring_meeting.human_day_of_week
               end
             end
           end if  @meeting.recurring_meeting.frequency != "daily"

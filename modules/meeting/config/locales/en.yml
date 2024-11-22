@@ -212,6 +212,11 @@ en:
       specific_date: "A specific date"
       iterations: "A number of occurrences"
     starts: "Starts"
+    in_words:
+      weekly: "%{frequency} on %{weekday}"
+      monthly: "%{frequency} on the %{date}"
+      yearly: "%{frequency} on the %{date} of %{month}"
+      full: "%{base} at %{time}, ends on %{end_date}"
 
   notice_successful_notification: "Notification sent successfully"
   notice_timezone_missing: No time zone is set and %{zone} is assumed. To choose your time zone, please click here.

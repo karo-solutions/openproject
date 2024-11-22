@@ -37,7 +37,6 @@ class RecurringMeeting < ApplicationRecord
   # so it can be passed to the template on save
   virtual_attribute :location do
     nil
-
   end
   virtual_attribute :duration do
     nil
@@ -47,17 +46,41 @@ class RecurringMeeting < ApplicationRecord
     I18n.t("recurring_meeting.frequency.#{frequency}")
   end
 
-  def human_date_of_week
-    day_of_the_week = I18n.l(start_time, format: "%A")
-    I18n.t("recurring_meeting.frequency.every_weekday", day_of_the_week:)
+  def human_day_of_week
+    I18n.t("recurring_meeting.frequency.every_weekday", day_of_the_week: weekday)
+  end
+
+  def weekday
+    I18n.l(start_time, format: "%A")
+  end
+
+  def month
+    I18n.l(start_time, format: "%B")
+  end
+
+  def date
+    start_time.day.ordinalize
   end
 
   def schedule
-    @schedule ||= begin
-      IceCube::Schedule.new(start_time, end_time: end_date).tap do |s|
-        s.add_recurrence_rule count_rule(frequency_rule)
-      end
+    @schedule ||= IceCube::Schedule.new(start_time, end_time: end_date).tap do |s|
+      s.add_recurrence_rule count_rule(frequency_rule)
     end
+  end
+
+  def schedule_in_words
+    base = case frequency
+           when "daily"
+             human_frequency
+           when "weekly", "biweekly"
+             I18n.t("recurring_meeting.in_words.weekly", frequency: human_frequency, weekday:)
+           when "monthly"
+             I18n.t("recurring_meeting.in_words.monthly", frequency: human_frequency, date:)
+           when "yearly"
+             I18n.t("recurring_meeting.in_words.yearly", frequency: human_frequency, date:, month:)
+           end
+
+    I18n.t("recurring_meeting.in_words.full", base:, time: format_time(start_time, include_date: false), end_date:)
   end
 
   def scheduled_occurrences(limit:)
