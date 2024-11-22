@@ -41,6 +41,16 @@
             end
           end if  @meeting.recurring_meeting.frequency != "daily"
         else
+          if @series.present?
+            details.with_row(mb: 2) do
+              render_meeting_attribute_row(:iterations) do
+                render(Primer::Beta::Link.new(href: recurring_meeting_path(@series), target: "_blank")) do
+                  @series.title
+                end
+              end
+            end
+          end
+
           details.with_row do
             render_meeting_attribute_row(:calendar) do
               render(Primer::Beta::Text.new) do

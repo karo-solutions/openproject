@@ -21,6 +21,9 @@
                                  placeholder: Meeting.human_attribute_name(:title),)
         if @meeting.template?
           "#{@meeting.title} (#{I18n.t(:label_template)})"
+        elsif @series.present?
+          concat render(Primer::Beta::Text.new) { format_date(@meeting.start_time) }
+          concat render(Primer::Beta::Text.new(color: :subtle)) { " (#{@series.title})" }
         else
           @meeting.title
         end
@@ -38,7 +41,7 @@
                          data: { 'turbo-stream': true }
                        }) do |item|
           item.with_leading_visual_icon(icon: :pencil)
-        end if @meeting.editable?
+        end if @meeting.editable? && !@series
 
         unless @meeting.template?
             menu.with_item(label: t(:button_copy),

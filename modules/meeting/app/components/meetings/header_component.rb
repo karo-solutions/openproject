@@ -32,6 +32,7 @@ module Meetings
     include OpTurbo::Streamable
     include OpPrimer::ComponentHelpers
     include Primer::FetchOrFallbackHelper
+    include Redmine::I18n
 
     STATE_DEFAULT = :show
     STATE_EDIT = :edit
@@ -70,6 +71,8 @@ module Meetings
     def meeting_element
       if @meeting.templated?
         I18n.t(:label_template)
+      elsif @series.present?
+        format_date(@meeting.start_time)
       else
         @meeting.title
       end
