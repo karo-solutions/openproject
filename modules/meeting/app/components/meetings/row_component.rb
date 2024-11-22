@@ -88,6 +88,11 @@ module Meetings
                               data: {
                                 "test-selector": "more-button"
                               })
+
+        if recurring_instance?
+          show_series_action(menu)
+        end
+
         if copy_allowed? && !recurring?
           copy_action(menu)
         end
@@ -97,6 +102,13 @@ module Meetings
         if delete_allowed?
           delete_action(menu)
         end
+      end
+    end
+
+    def show_series_action(menu)
+      menu.with_item(label: I18n.t(:label_view_meeting_series),
+                     href: recurring_meeting_path(model.recurring_meeting_id)) do |item|
+        item.with_leading_visual_icon(icon: :eye)
       end
     end
 
@@ -148,6 +160,10 @@ module Meetings
 
     def copy_allowed?
       User.current.allowed_in_project?(:create_meetings, model.project)
+    end
+
+    def recurring_instance?
+      model.recurring_meeting_id.present?
     end
 
     def recurring?
